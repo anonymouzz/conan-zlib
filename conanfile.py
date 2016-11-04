@@ -13,15 +13,15 @@ class ZlibConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = "shared=False"
     exports = ["CMakeLists.txt", "FindZLIB.cmake"]
-    url="http://github.com/lasote/conan-zlib"
+    url="http://github.com/anonymouzz/conan-zlib"
     license="http://www.zlib.net/zlib_license.html"
-    
+
     def config(self):
         try: # Try catch can be removed when conan 0.8 is released
-            del self.settings.compiler.libcxx 
-        except: 
+            del self.settings.compiler.libcxx
+        except:
             pass
-        
+
     def source(self):
         zip_name = "zlib-1.2.8.zip"
         download("http://zlib.net/zlib128.zip", zip_name)
@@ -40,16 +40,16 @@ class ZlibConan(ConanFile):
             if self.settings.arch == "x86" or self.settings.arch == "x86_64":
                 env_line = env_line.replace('CFLAGS="', 'CFLAGS="-mstackrealign ')
             self.output.warn(env_line)
-                        
+
             if self.settings.os == "Macos":
                 old_str = '-install_name $libdir/$SHAREDLIBM'
                 new_str = '-install_name $SHAREDLIBM'
                 replace_in_file("./%s/configure" % self.ZIP_FOLDER_NAME, old_str, new_str)
-                     
+
             self.run("cd %s && %s ./configure" % (self.ZIP_FOLDER_NAME, env_line))
             #self.run("cd %s && %s make check" % (self.ZIP_FOLDER_NAME, env.command_line))
             self.run("cd %s && %s make" % (self.ZIP_FOLDER_NAME, env_line))
-         
+
         else:
             cmake = CMake(self.settings)
             if self.settings.os == "Windows":
@@ -68,7 +68,7 @@ class ZlibConan(ConanFile):
         """
         # Copy findZLIB.cmake to package
         self.copy("FindZLIB.cmake", ".", ".")
-        
+
         # Copying zlib.h, zutil.h, zconf.h
         self.copy("*.h", "include", "%s" % (self.ZIP_FOLDER_NAME), keep_path=False)
         self.copy("*.h", "include", "%s" % ("_build"), keep_path=False)
